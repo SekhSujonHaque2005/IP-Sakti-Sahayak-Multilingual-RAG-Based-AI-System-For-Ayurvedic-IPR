@@ -1,0 +1,27 @@
+{
+  "session_id": "6e0f514d-8aaa-47a4-962d-88bf2b1a4135",
+  "user_id": "anonymous",
+  "created_at": "2026-09-15T20:47:52.588128",
+  "updated_at": "2026-09-15T20:48:19.124987",
+  "regulatory_state": {
+    "jurisdiction": null,
+    "category": null,
+    "ingredients": [],
+    "source": null,
+    "process": null,
+    "biological_resource_flag": null,
+    "traditional_knowledge_overlap": null,
+    "abs_required": null
+  },
+  "turns": [
+    {
+      "turn_index": 0,
+      "timestamp": "2026-09-15T20:48:19.124945",
+      "query": "What is Ayurveda?",
+      "answer": "Ayurveda is considered by many scholars to be the oldest healing science. Ayurveda focuses on restoring balance with diet, herbs, and lifestyle changes.",
+      "citations": [],
+      "confidence": 0.63,
+      "chunks_used": []
+    }
+  ]
+}

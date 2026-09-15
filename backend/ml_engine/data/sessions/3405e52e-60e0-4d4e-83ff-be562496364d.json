@@ -1,0 +1,17 @@
+{
+  "session_id": "3405e52e-60e0-4d4e-83ff-be562496364d",
+  "user_id": "anonymous",
+  "created_at": "2026-09-15T20:07:37.081785",
+  "updated_at": "2026-09-15T20:07:37.081796",
+  "regulatory_state": {
+    "jurisdiction": null,
+    "category": null,
+    "ingredients": [],
+    "source": null,
+    "process": null,
+    "biological_resource_flag": null,
+    "traditional_knowledge_overlap": null,
+    "abs_required": null
+  },
+  "turns": []
+}

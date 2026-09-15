@@ -1,6 +1,35 @@
 venv/
 .env
+backend/.env
 __pycache__/
 *.pyc
 node_modules/
+dist/
 .next/
+.agents
+skills-lock.json
+vault.json
+.claude
+.claude/*
+.agent
+.agent/*
+.gemini
+.gemini/*
+
+# Exclude large raw PDFs (corpus_raw and ocr_pending)
+corpus_raw/
+ocr_pending/
+*.pdf
+
+# Logs and test artifacts
+*.log
+data/test_sessions/
+backend/data/test_sessions/
+
+# Generated ML indexes and databases (built on demand)
+backend/ml_engine/data/indices/
+indices/
+*.index
+*.pkl
+*.db
+ocr_chunks_final.jsonl

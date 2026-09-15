@@ -1,0 +1,27 @@
+{
+  "session_id": "c84186fe-a904-4000-a88e-9d5c04803f06",
+  "user_id": "anonymous",
+  "created_at": "2026-09-15T13:51:06.780751",
+  "updated_at": "2026-09-15T13:52:19.542868",
+  "regulatory_state": {
+    "jurisdiction": null,
+    "category": null,
+    "ingredients": [],
+    "source": null,
+    "process": null,
+    "biological_resource_flag": null,
+    "traditional_knowledge_overlap": null,
+    "abs_required": null
+  },
+  "turns": [
+    {
+      "turn_index": 0,
+      "timestamp": "2026-09-15T13:52:19.542849",
+      "query": "What is the punishment for false claims under the Biodiversity Act?",
+      "answer": "The provided legal corpus does not contain enough information to answer this query.",
+      "citations": [],
+      "confidence": 0.0,
+      "chunks_used": []
+    }
+  ]
+}

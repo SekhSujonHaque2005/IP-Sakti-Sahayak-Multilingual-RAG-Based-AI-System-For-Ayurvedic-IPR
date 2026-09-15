@@ -1,0 +1,27 @@
+{
+  "session_id": "8b02f4c7-8cc1-4411-b08b-bd40d7239558",
+  "user_id": "anonymous",
+  "created_at": "2026-09-14T12:47:18.017405",
+  "updated_at": "2026-09-14T12:47:22.929623",
+  "regulatory_state": {
+    "jurisdiction": null,
+    "category": null,
+    "ingredients": [],
+    "source": null,
+    "process": null,
+    "biological_resource_flag": null,
+    "traditional_knowledge_overlap": null,
+    "abs_required": null
+  },
+  "turns": [
+    {
+      "turn_index": 0,
+      "timestamp": "2026-09-14T12:47:22.929605",
+      "query": "Is ashwagandha regulated as a drug in India?",
+      "answer": "Error during AI synthesis: 'LLMClient' object has no attribute 'synthesize'",
+      "citations": [],
+      "confidence": 0.0,
+      "chunks_used": []
+    }
+  ]
+}

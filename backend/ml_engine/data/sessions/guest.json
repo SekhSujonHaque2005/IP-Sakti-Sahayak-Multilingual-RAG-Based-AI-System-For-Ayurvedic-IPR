@@ -1,0 +1,237 @@
+{
+  "session_id": "guest",
+  "user_id": "anonymous",
+  "created_at": "2026-09-15T16:31:29.323771",
+  "updated_at": "2026-09-15T21:45:43.088027",
+  "regulatory_state": {
+    "jurisdiction": null,
+    "category": null,
+    "ingredients": [],
+    "source": null,
+    "process": null,
+    "biological_resource_flag": null,
+    "traditional_knowledge_overlap": null,
+    "abs_required": null
+  },
+  "turns": [
+    {
+      "turn_index": 0,
+      "timestamp": "2026-09-15T16:32:36.563057",
+      "query": "What is the Drugs and Cosmetics Act?",
+      "answer": "I don't have a reliable, sourced answer to this question. This may need a qualified IP/regulatory professional -- consider consulting AIIA's IP facilitation cell or a registered patent agent.",
+      "citations": [],
+      "confidence": 0.0,
+      "chunks_used": []
+    },
+    {
+      "turn_index": 1,
+      "timestamp": "2026-09-15T16:34:07.072939",
+      "query": "Tell me About Ayurvedic Regulations",
+      "answer": "I don't have a reliable, sourced answer to this question. This may need a qualified IP/regulatory professional -- consider consulting AIIA's IP facilitation cell or a registered patent agent.",
+      "citations": [],
+      "confidence": 0.0,
+      "chunks_used": [
+        "drugs_and_cosmetics_act_1940::Schedule to::0",
+        "drugs_and_cosmetics_rules_1945_2024::Schedule E::34",
+        "ayurveda_aahara_regulations_2022::Schedule E-1::2"
+      ]
+    },
+    {
+      "turn_index": 2,
+      "timestamp": "2026-09-15T19:22:24.513579",
+      "query": "hi",
+      "answer": "The provided legal corpus does not contain enough information to answer this query.",
+      "citations": [],
+      "confidence": 0.0,
+      "chunks_used": []
+    },
+    {
+      "turn_index": 3,
+      "timestamp": "2026-09-15T19:22:30.558437",
+      "query": "hi",
+      "answer": "The provided legal corpus does not contain enough information to answer this query.",
+      "citations": [],
+      "confidence": 0.0,
+      "chunks_used": [
+        "tkdl_general_information::Preamble::0",
+        "madrid_protocol_route_to_global_branding_2026::Article 6ter::0",
+        "drugs_and_cosmetics_act_1940::Schedule to::0"
+      ]
+    },
+    {
+      "turn_index": 4,
+      "timestamp": "2026-09-15T19:26:22.239321",
+      "query": "What is Ayurveda ??",
+      "answer": "The provided legal corpus does not contain enough information to answer this query.",
+      "citations": [],
+      "confidence": 0.0,
+      "chunks_used": [
+        "ayurveda_aahara_regulations_2022::Schedule E-1::2",
+        "drugs_and_cosmetics_rules_1945_2024::Schedule L-l::32",
+        "ayurveda_aahara_regulations_2022::Schedule B::6"
+      ]
+    },
+    {
+      "turn_index": 5,
+      "timestamp": "2026-09-15T20:18:34.170690",
+      "query": "What is Section 3(p) of the Patents Act?",
+      "answer": "Section 3(p) of the Patents Act excludes from patentability an invention which, in effect, is traditional knowledge or an aggregation or duplication of known properties of traditionally known components.",
+      "citations": [],
+      "confidence": 0.8,
+      "chunks_used": []
+    },
+    {
+      "turn_index": 6,
+      "timestamp": "2026-09-15T20:19:57.014214",
+      "query": "What is the Nagoya Protocol on Access and Benefit Sharing?",
+      "answer": "The Nagoya Protocol on Access and Benefit Sharing is an international treaty adopted under the auspices of the Convention on Biological Diversity (CBD) in Nagoya, Japan on October 29, 2010. Its objective is the fair and equitable sharing of benefits arising from the utilization of genetic resources, thereby contributing to the conservation and sustainable use of biodiversity.",
+      "citations": [],
+      "confidence": 0.8,
+      "chunks_used": [
+        "wipo_gratk_executive_summary_2024::Article 2.::0",
+        "therapeutic_goods_regulations_1990::Schedule 1::47",
+        "nagoya_protocol_factsheet::Preamble::0",
+        "pct_regulations_2026::Rule 4::4",
+        "wipo_gratk_treaty_2024::Article 22::22"
+      ]
+    },
+    {
+      "turn_index": 7,
+      "timestamp": "2026-09-15T20:22:31.767562",
+      "query": "What does the Biological Diversity Act say about foreign access to biological resources?",
+      "answer": "The Biological Diversity Act regulates access to biological resources and associated traditional knowledge, specifying distinct frameworks for regulating access by foreign and Indian entities. Foreign entities and individuals require prior approval before accessing Indian biological resources. Foreign entities are subject to specific obligations when accessing research results based on Indian biological resources or using foreign biological resources within India.",
+      "citations": [],
+      "confidence": 0.8,
+      "chunks_used": []
+    },
+    {
+      "turn_index": 8,
+      "timestamp": "2026-09-15T20:34:04.532500",
+      "query": "What is Section 3(p) of the Patents Act?",
+      "answer": "Section 3(p) of the Patents Act, 1970 excludes from patentability an invention which, in effect, is traditional knowledge or an aggregation or duplication of known properties of traditionally known components. Section 3(p) of the Patents Act, 1970 states that an invention which, in effect, is traditional knowledge or an aggregation or duplication of known properties of traditionally known components is not considered an invention and, therefore, is not patentable.",
+      "citations": [],
+      "confidence": 0.8,
+      "chunks_used": []
+    },
+    {
+      "turn_index": 9,
+      "timestamp": "2026-09-15T20:41:49.241522",
+      "query": "Tell Me About Ayurvedic Regulations.",
+      "answer": "The Food Safety and Standards (Ayurveda Aahara) Regulations, 2022, have been introduced to regulate Ayurvedic products, including rules covering health claims and the addition of vitamins and minerals. The regulations stipulate that the labeling, presentation, and advertisement of 'Ayurveda Aahara' must not claim that the product has the property of preventing, treating, or curing a human disease or refer to such properties. Every label of 'Ayurveda Aahara' must specify the intended purpose, the target consumer group, recommended duration of use, and other specific labeling requirements, including an advisory warning stating 'Only for dietary use' and a statement that 'Ayurveda Aahara' is not to be used as a substitute for a varied diet. The regulations also specify that 'Ayurveda Aahara' cannot be manufactured for infants aged up to 24 months. Food business operators must formulate 'Ayurveda Aahara' in accordance with the specified categories and requirements and manufacture the products in compliance with Schedule 4 of the Food Safety and Standards (Licensing and Registration of Food Businesses) Regulation, 2011.",
+      "citations": [],
+      "confidence": 0.8,
+      "chunks_used": [
+        "tk_biological_material_guidelines_2012::Section 3::0",
+        "ayush_related_inventions_guidelines_2025::Section 3::12",
+        "biological_diversity_amendment_act_2023::Section 1::0",
+        "biological_diversity_act_2002::Schedule to::0",
+        "pharmaceutical_patent_guidelines_2014::Section 2::0"
+      ]
+    },
+    {
+      "turn_index": 10,
+      "timestamp": "2026-09-15T20:53:08.883869",
+      "query": "What is Ayurveda?",
+      "answer": "Ayurveda is one of the oldest and most comprehensive systems of medicine in the world, originating from India more than 5000 years ago. It is based on the holistic principles of balancing the physical, mental, emotional, and spiritual aspects of health and well-being.",
+      "citations": [],
+      "confidence": 0.8,
+      "chunks_used": [
+        "tk_biological_material_guidelines_2012::Section 3::0",
+        "ayush_related_inventions_guidelines_2025::Section 3::12",
+        "biological_diversity_amendment_act_2023::Section 1::0",
+        "pharmaceutical_patent_guidelines_2014::Section 3::4",
+        "biological_diversity_act_2002::Schedule to::0"
+      ]
+    },
+    {
+      "turn_index": 11,
+      "timestamp": "2026-09-15T20:55:02.250378",
+      "query": "Can I patent a classical formulation?",
+      "answer": "Section 3(p) of the Patents Act, 1970 bars the patenting of traditional knowledge or an aggregation or duplication of known properties of traditionally known components. The Madras High Court's panchagavya decision shows that simply altering the ratios of known ingredients, where those ingredients still deliver their already-known effects, remains 'in effect' traditional knowledge under Section 3(p). Ayurvedic medicines often don't have intellectual property (IP) protection because they come from old traditions and community practices handed down over time.",
+      "citations": [],
+      "confidence": 0.8,
+      "chunks_used": [
+        "ayush_related_inventions_guidelines_2025::Section 3::12",
+        "tk_biological_material_guidelines_2012::Section 3::0",
+        "tkdl_faq::Preamble::0",
+        "abs_regulations_2025::Section 3::1",
+        "csir_tkdl_overview::Article 6::0"
+      ]
+    },
+    {
+      "turn_index": 12,
+      "timestamp": "2026-09-15T20:57:12.164873",
+      "query": "Can I patent a classical formulation?",
+      "answer": "You cannot patent a classical formulation if it is considered traditional knowledge or an aggregation of known properties of traditionally known components, as per Section 3(p) of the Patents Act, 1970. Combining known traditional knowledge ingredients for known effects falls under Section 3(p) and is not patentable, as per the Madras High Court's decision in Zero Brand Zone v. Controller (2024).",
+      "citations": [],
+      "confidence": 0.8,
+      "chunks_used": [
+        "ayush_related_inventions_guidelines_2025::Section 3::12",
+        "tk_biological_material_guidelines_2012::Section 3::0",
+        "csir_tkdl_overview::Article 6::0",
+        "biological_diversity_amendment_act_2023::Section 1::0",
+        "tkdl_faq::Preamble::0"
+      ]
+    },
+    {
+      "turn_index": 13,
+      "timestamp": "2026-09-15T21:43:12.389425",
+      "query": "Can I patent a classical formulation?",
+      "answer": "Section 3(p) bars traditional knowledge and aggregation of known properties from being patented. Combining known traditional knowledge ingredients for known effects falls under Section 3(p) and is not patentable. Simply altering the ratios of known ingredients, where those ingredients still deliver their already-known effects, remains 'in effect' traditional knowledge under Section 3(p).",
+      "citations": [],
+      "confidence": 0.8,
+      "chunks_used": [
+        "ayush_related_inventions_guidelines_2025::Section 3::12",
+        "pharmaceutical_patent_guidelines_2014::Section 3::4",
+        "tkdl_faq::Preamble::0",
+        "csir_tkdl_overview::Article 6::0",
+        "pharmaceutical_patent_guidelines_2014::Section 2::0"
+      ]
+    },
+    {
+      "turn_index": 14,
+      "timestamp": "2026-09-15T21:43:55.183817",
+      "query": "Can I patent a classical formulation?",
+      "answer": "Section 3(p) of the Patents Act, 1970 bars the patenting of traditional knowledge and aggregation of known properties of traditionally known components.",
+      "citations": [],
+      "confidence": 0.47,
+      "chunks_used": [
+        "ayush_related_inventions_guidelines_2025::Section 3::12",
+        "pharmaceutical_patent_guidelines_2014::Section 3::4",
+        "tkdl_faq::Preamble::0",
+        "tk_biological_material_guidelines_2012::Section 3::0",
+        "csir_tkdl_overview::Article 6::0"
+      ]
+    },
+    {
+      "turn_index": 15,
+      "timestamp": "2026-09-15T21:45:06.259671",
+      "query": "Can I patent a classical formulation?",
+      "answer": "Section 3(p) of the Patents Act, 1970 bars the patenting of traditional knowledge and the aggregation or duplication of known properties of traditionally known components. Combining known traditional knowledge ingredients for known effects falls under Section 3(p) and is not patentable. Ayurvedic medicines often do not have intellectual property protection because they come from old traditions and community practices handed down over time.",
+      "citations": [],
+      "confidence": 0.8,
+      "chunks_used": [
+        "pharmaceutical_patent_guidelines_2014::Section 3::4",
+        "ayush_related_inventions_guidelines_2025::Section 3::12",
+        "csir_tkdl_overview::Article 6::0",
+        "tkdl_faq::Preamble::0",
+        "pharmaceutical_patent_guidelines_2014::Section 2::0"
+      ]
+    },
+    {
+      "turn_index": 16,
+      "timestamp": "2026-09-15T21:45:43.088003",
+      "query": "Can I patent a classical formulation?",
+      "answer": "Section 3(p) of the Patents Act, 1970 bars the patenting of traditional knowledge or an aggregation or duplication of known properties of traditionally known components.",
+      "citations": [],
+      "confidence": 0.53,
+      "chunks_used": [
+        "ayush_related_inventions_guidelines_2025::Section 3::12",
+        "pharmaceutical_patent_guidelines_2014::Section 3::4",
+        "pharmaceutical_patent_guidelines_2014::Section 2::0",
+        "pharmaceutical_patent_guidelines_2014::Section 3::8",
+        "pharmaceutical_patent_guidelines_2014::Section 10::6"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,33 @@
+{
+  "session_id": "aff38a5b-46fe-439e-bd69-daea8d378070",
+  "user_id": "anonymous",
+  "created_at": "2026-09-15T20:07:37.082729",
+  "updated_at": "2026-09-15T20:08:15.835011",
+  "regulatory_state": {
+    "jurisdiction": null,
+    "category": null,
+    "ingredients": [],
+    "source": null,
+    "process": null,
+    "biological_resource_flag": null,
+    "traditional_knowledge_overlap": null,
+    "abs_required": null
+  },
+  "turns": [
+    {
+      "turn_index": 0,
+      "timestamp": "2026-09-15T20:08:15.834919",
+      "query": "What is Section 3(p) of the Patents Act?",
+      "answer": "Section 3(p) of the Patents Act, 1970, states that an invention which, in effect, is traditional knowledge or an aggregation or duplication of known properties of traditionally known component or components is not considered an invention and, therefore, is not patentable under the Patents Act.",
+      "citations": [],
+      "confidence": 0.87,
+      "chunks_used": [
+        "patents_rules_2003_consolidated_2021::Rule 95.::100",
+        "ayush_related_inventions_guidelines_2025::Section 2::0",
+        "patents_rules_2003_consolidated_2021::Rule 113.::120",
+        "ayush_related_inventions_guidelines_2025::Section 3::12",
+        "ayush_related_inventions_guidelines_2025::Section 3::4"
+      ]
+    }
+  ]
+}

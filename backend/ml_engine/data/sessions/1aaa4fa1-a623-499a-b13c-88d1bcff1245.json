@@ -1,0 +1,27 @@
+{
+  "session_id": "1aaa4fa1-a623-499a-b13c-88d1bcff1245",
+  "user_id": "anonymous",
+  "created_at": "2026-09-15T17:41:22.484097",
+  "updated_at": "2026-09-15T17:42:22.800153",
+  "regulatory_state": {
+    "jurisdiction": null,
+    "category": null,
+    "ingredients": [],
+    "source": null,
+    "process": null,
+    "biological_resource_flag": null,
+    "traditional_knowledge_overlap": null,
+    "abs_required": null
+  },
+  "turns": [
+    {
+      "turn_index": 0,
+      "timestamp": "2026-09-15T17:42:22.800125",
+      "query": "Tell me About Ayurvedic Regulations",
+      "answer": "The Indian authorities have introduced new regulations on Ayurvedic products, including rules covering health claims and the addition of vitamins and minerals. The Food Safety and Standards (Ayurveda Aahara) Regulations, 2022, came into force earlier this month, following a draft notification and public consultation last year. The regulations define Ayurveda Aahara to mean a food prepared in accordance with the recipes or ingredients and/or processes as per methods described in the authoritative books of Ayurveda listed under ‘Schedule A’ of the regulations. The implementation date for the regulations is May 5, 2022. The regulations specify that the labelling, presentation, and advertisement of ‘Ayurveda Aahara’ shall not claim that the product has the property of preventing, treating, or curing a human disease or refer to such properties. Every label of ‘Ayurveda Aahara’ must specify the intended purpose, the target consumer group, recommended duration of use, and other specific labelling requirements. The Food Safety and Standards Authority of India (FSSAI), in consultation with the Ministry of Ayush, has released a definitive list of Ayurvedic food preparations under the category of ‘Ayurveda Aahara’.",
+      "citations": [],
+      "confidence": 0.8,
+      "chunks_used": []
+    }
+  ]
+}
