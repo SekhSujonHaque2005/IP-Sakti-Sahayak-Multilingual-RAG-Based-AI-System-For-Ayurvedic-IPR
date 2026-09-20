@@ -6,10 +6,15 @@ from app.core.security import verify_token
 
 def get_current_user(request: Request, db: Session = Depends(get_db)) -> User:
     """
-    Dependency to extract the HttpOnly JWT access token from the request cookies,
-    verify it, and return the User object.
+    Dependency to extract the JWT access token from Authorization Bearer header
+    or HttpOnly request cookies, verify it, and return the User object.
     """
     token = request.cookies.get("access_token")
+    if not token:
+        auth_header = request.headers.get("Authorization")
+        if auth_header and auth_header.startswith("Bearer "):
+            token = auth_header[7:].strip()
+            
     if not token:
         raise HTTPException(status_code=401, detail="Not authenticated. Please log in.")
         

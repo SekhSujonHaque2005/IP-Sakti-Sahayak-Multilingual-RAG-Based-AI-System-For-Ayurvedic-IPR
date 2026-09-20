@@ -5,6 +5,7 @@ class QueryRequest(BaseModel):
     query: str
     session_id: Optional[str] = None
     jurisdiction: Optional[str] = "IN"  # "IN" for India, "INTL" for International
+    language: Optional[str] = "en"  # "en", "hi", "sa", "ta", "te", "bn"
 
 class SourceDoc(BaseModel):
     title: str
@@ -49,9 +50,23 @@ def validate_password_strength(v: str) -> str:
         raise ValueError("Password must contain at least one special character")
     return v
 
+class UserResponse(BaseModel):
+    id: str
+    email: EmailStr
+    full_name: Optional[str] = None
+    is_active: bool = True
+
+class AuthTokenResponse(BaseModel):
+    message: str = "Success"
+    access_token: str
+    refresh_token: str
+    token_type: str = "bearer"
+    user: UserResponse
+
 class UserSignup(BaseModel):
     email: EmailStr
     password: str
+    full_name: Optional[str] = None
 
     @field_validator('password')
     @classmethod

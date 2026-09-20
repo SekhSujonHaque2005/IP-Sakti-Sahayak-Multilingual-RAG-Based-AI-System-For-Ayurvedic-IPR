@@ -34,6 +34,7 @@ def public_query(request: Request, payload: QueryRequest):
             query=payload.query,
             session_id=payload.session_id or "guest",
             jurisdiction=payload.jurisdiction or "IN",
+            language=payload.language or "en",
         )
         return result
     except Exception as e:

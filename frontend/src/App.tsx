@@ -1,33 +1,65 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route, useLocation, Navigate } from 'react-router-dom';
+import Header from './components/Header';
+import Footer from './components/Footer';
 import LandingView from './components/LandingView';
+import { LoginView, SignupView } from './components/AuthViews';
+import OnboardingView from './components/OnboardingView';
+import HomeDashboard from './components/HomeDashboard';
 import WizardView from './components/WizardView';
 import ChatView from './components/ChatView';
-import Header from './components/Header';
+import RegulatoryMapView from './components/RegulatoryMapView';
+import UpdatesView from './components/UpdatesView';
+import SourcesView from './components/SourcesView';
+import { AppProvider } from './context/AppContext';
+import { ShaderBackground } from './components/shared/ShaderBackground';
+
+function LayoutShell({ children }: { children: React.ReactNode }) {
+  const location = useLocation();
+  const isAuthPage = location.pathname === '/login' || location.pathname === '/signup' || location.pathname === '/onboarding';
+  const isChatPage = location.pathname === '/ask' || location.pathname === '/chat';
+
+  return (
+    <div className={`relative ${isChatPage ? 'h-screen max-h-screen overflow-hidden' : 'min-h-screen'} flex flex-col bg-[#F7F3EB] text-forest-black antialiased selection:bg-terracotta/15 selection:text-terracotta musky-theme overflow-x-hidden`}>
+      <ShaderBackground />
+      <Header />
+      <main className={`relative z-10 flex-1 w-full ${isChatPage ? 'mt-16 sm:mt-20 h-[calc(100vh-4rem)] sm:h-[calc(100vh-5rem)] max-h-[calc(100vh-4rem)] sm:max-h-[calc(100vh-5rem)] flex flex-col overflow-hidden' : 'pt-20 sm:pt-24'}`}>
+        {children}
+      </main>
+      {!isAuthPage && !isChatPage && <Footer />}
+    </div>
+  );
+}
 
 function App() {
   return (
-    <Router>
-      <div className="min-h-[100dvh] bg-[#050505] text-white font-sans antialiased overflow-x-hidden">
-        {/* Subtle radial mesh gradient background */}
-        <div className="fixed inset-0 z-0 pointer-events-none">
-          <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-brand-900/20 rounded-full blur-[120px] mix-blend-screen opacity-50 transform translate-x-1/3 -translate-y-1/3"></div>
-          <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-indigo-900/20 rounded-full blur-[100px] mix-blend-screen opacity-30 transform -translate-x-1/4 translate-y-1/4"></div>
-          {/* Subtle noise overlay for haptic depth */}
-          <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=\'0 0 200 200\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'noiseFilter\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.65\' numOctaves=\'3\' stitchTiles=\'stitch\'/%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23noiseFilter)\'/%3E%3C/svg%3E")' }}></div>
-        </div>
-
-        <div className="relative z-10">
-          <Header />
-          <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-32 pb-24">
-            <Routes>
-              <Route path="/" element={<LandingView />} />
-              <Route path="/wizard" element={<WizardView />} />
-              <Route path="/chat" element={<ChatView />} />
-            </Routes>
-          </main>
-        </div>
-      </div>
-    </Router>
+    <AppProvider>
+      <Router>
+        <LayoutShell>
+          <Routes>
+            <Route path="/" element={<LandingView />} />
+            <Route path="/login" element={<LoginView />} />
+            <Route path="/signup" element={<SignupView />} />
+            <Route path="/onboarding" element={<OnboardingView />} />
+            <Route path="/home" element={<HomeDashboard />} />
+            <Route path="/assess" element={<WizardView />} />
+            <Route path="/wizard" element={<WizardView />} />
+            <Route path="/ask" element={<ChatView />} />
+            <Route path="/chat" element={<ChatView />} />
+            <Route path="/regulatory-map" element={<RegulatoryMapView />} />
+            <Route path="/updates" element={<UpdatesView />} />
+            <Route path="/sources" element={<SourcesView />} />
+            {/* Backward-compatibility redirects for removed non-essential pages */}
+            <Route path="/cases" element={<Navigate to="/home" replace />} />
+            <Route path="/cases/*" element={<Navigate to="/home" replace />} />
+            <Route path="/quick-tools" element={<Navigate to="/regulatory-map" replace />} />
+            <Route path="/quick-tools/*" element={<Navigate to="/regulatory-map" replace />} />
+            {/* Fallback */}
+            <Route path="*" element={<LandingView />} />
+          </Routes>
+        </LayoutShell>
+      </Router>
+    </AppProvider>
   );
 }
 

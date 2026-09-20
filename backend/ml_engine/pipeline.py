@@ -11,14 +11,16 @@ from pathlib import Path
 import uuid
 
 # Import our custom ML modules
-from ml_engine.core.guardrails import check_input_safety, scrub_pii, MANDATORY_DISCLAIMER
-from ml_engine.core.query_processor import detect_intent, rewrite_for_retrieval
+from ml_engine.core.guardrails import check_input_safety, scrub_pii, MANDATORY_DISCLAIMER, get_disclaimer
+from ml_engine.core.query_processor import detect_intent, rewrite_for_retrieval, get_clean_web_search_query
 from ml_engine.search.retrieval import hybrid_retrieve, load_chunks
 from ml_engine.search.web_search import web_search
 from ml_engine.core.llm_client import LLMClient
 from ml_engine.telemetry.session_manager import SessionManager
 from ml_engine.telemetry.analytics import AnalyticsLogger
 from ml_engine.legal_logic.supersession_graph import resolve_current_document
+from ml_engine.synthesis.multilingual import get_greeting, get_language_instruction, apply_regulatory_phrase_mapping
+from ml_engine.synthesis.legal_cleaner import strip_markdown_decorations, format_document_title
 
 # Initialize globals
 session_manager = SessionManager()
@@ -35,17 +37,7 @@ GREETING_WORDS = {
     "namaste", "namaskar", "pranam", "jai hind",
 }
 
-GREETING_RESPONSE = (
-    "Namaste! 🙏 I am VaidyaSetu — your AI assistant for Ayurveda "
-    "Intellectual Property and Regulatory guidance.\n\n"
-    "I can help you with:\n"
-    "• Patent & IP questions — Can your formulation be patented? What does Section 3(p) say?\n"
-    "• Regulatory pathways — Is your product a classical medicine, Ayurveda-Aahar, or a new drug?\n"
-    "• Biodiversity & ABS compliance — Do you need NBA approval?\n"
-    "• Law lookups — What does a specific rule or act say?\n\n"
-    "Ask me anything about Ayurveda IP law — I'll cite the exact legal source for every claim I make.\n\n"
-    "⚖️ Note: I provide legal information, not legal advice."
-)
+# Greeting response is now language-aware — see ml_engine.synthesis.multilingual.get_greeting()
 
 
 def _is_greeting(query: str) -> bool:
@@ -56,7 +48,7 @@ def _is_greeting(query: str) -> bool:
 # ──────────────────────────────────────────────────────────────
 # Load Vector Indices for BOTH Jurisdictions
 # ──────────────────────────────────────────────────────────────
-from ml_engine.search.retrieval import load_index_from_disk
+from ml_engine.search.retrieval import load_index_from_disk, get_embed_model
 
 import sys
 if hasattr(sys.stdout, "reconfigure"):
@@ -82,13 +74,21 @@ for jur in ["IN", "INTL"]:
 
 if not VECTOR_INDICES:
     print("  [WARN] No vector indices loaded. Relying entirely on Web Search.")
+
+# Pre-warm embedding model so runtime queries don't hit cold start timeouts
+try:
+    print("Pre-warming multilingual embedding model...")
+    get_embed_model()
+    print("  [OK] Embedding model pre-warmed and ready.")
+except Exception as e:
+    print(f"  [WARN] Could not pre-warm embedding model: {e}")
 print("=" * 60)
 
 
 # ──────────────────────────────────────────────────────────────
 # Main Query Handler (Non-Streaming)
 # ──────────────────────────────────────────────────────────────
-def handle_query(query: str, session_id: str = None, jurisdiction: str = "IN") -> Dict[str, Any]:
+def handle_query(query: str, session_id: str = None, jurisdiction: str = "IN", language: str = "en") -> Dict[str, Any]:
     """
     Executes the full RAG pipeline:
     0. Greeting detection
@@ -113,12 +113,13 @@ def handle_query(query: str, session_id: str = None, jurisdiction: str = "IN") -
     if _is_greeting(query):
         latency_ms = round((time.time() - t_start) * 1000)
         return {
-            "answer": GREETING_RESPONSE,
+            "answer": get_greeting(language),
             "confidence": 1.0,
             "sources": [],
             "disclaimer": "",
             "supersession_paths": [],
             "jurisdiction": jurisdiction,
+            "language": language,
             "reasoning_steps": [
                 {
                     "title": "Conversational Greeting",
@@ -170,40 +171,30 @@ def handle_query(query: str, session_id: str = None, jurisdiction: str = "IN") -
     context = session_manager.get_context_for_llm(session_id)
     search_query = f"{context}\n\nCurrent Query: {rewritten_query}" if context else rewritten_query
 
-    # ── 3. Concurrent Retrieval Phase ────────────────────────
+    # ── 3. Retrieval Phase ───────────────────────────────────
     vector_results = []
     web_results = []
 
-    with concurrent.futures.ThreadPoolExecutor(max_workers=2) as executor:
-        # Task A: Vector Search (jurisdiction-aware)
-        def do_vector_search():
-            index = VECTOR_INDICES.get(jurisdiction)
-            if index:
-                return hybrid_retrieve(search_query, index, top_k=5)
-            print(f"[PIPELINE] No vector index for jurisdiction '{jurisdiction}'")
-            return []
-
-        # Task B: Web Search (use original query, not the rewritten one)
-        def do_web_search():
-            web_query = f"Ayurveda India IP regulation {scrubbed_query}"
-            return web_search(web_query, max_results=3)
-
-        future_vector = executor.submit(do_vector_search)
-        future_web = executor.submit(do_web_search)
-
+    # Step 3a: Vector Search on Codified Statutory Database (Direct & Instant)
+    index = VECTOR_INDICES.get(jurisdiction)
+    if index:
         try:
-            vector_results = future_vector.result(timeout=30)
-            print(f"[PIPELINE] Vector search returned {len(vector_results)} results")
+            vector_results = hybrid_retrieve(search_query, index, top_k=6)
+            print(f"[PIPELINE] Vector search returned {len(vector_results)} statutory results")
         except Exception as e:
             import traceback
             traceback.print_exc()
             print(f"[PIPELINE] Vector search failed ({type(e).__name__}): {e}")
+    else:
+        print(f"[PIPELINE] No vector index for jurisdiction '{jurisdiction}'")
 
-        try:
-            web_results = future_web.result(timeout=15)
-            print(f"[PIPELINE] Web search returned {len(web_results)} results")
-        except Exception as e:
-            print(f"[PIPELINE] Web search failed ({type(e).__name__}): {e}")
+    # Step 3b: Live Grounded Web Search (Cleaned & Relevance Filtered)
+    try:
+        clean_web_q = get_clean_web_search_query(scrubbed_query)
+        web_results = web_search(clean_web_q, max_results=4)
+        print(f"[PIPELINE] Web search returned {len(web_results)} results for '{clean_web_q}'")
+    except Exception as e:
+        print(f"[PIPELINE] Web search failed ({type(e).__name__}): {e}")
 
     # ── 4. Build Combined Chunks with Supersession ───────────
     combined_chunks = []
@@ -225,15 +216,16 @@ def handle_query(query: str, session_id: str = None, jurisdiction: str = "IN") -
             })
 
         snippet = v.get("text", "")[:800]
+        doc_display_title = format_document_title(doc_name, language=language) if language == "hi" else doc_name
         combined_chunks.append({
             "chunk_id": chunk_id,
-            "document": doc_name,
+            "document": doc_display_title,
             "clause_label": v.get("clause_label", "N/A"),
             "text": snippet,
             "superseded": is_superseded,
         })
         sources.append({
-            "title": doc_name,
+            "title": doc_display_title,
             "snippet": snippet[:150],
             "url": v.get("source_url", "local_corpus"),
             "source_type": "corpus",
@@ -242,15 +234,17 @@ def handle_query(query: str, session_id: str = None, jurisdiction: str = "IN") -
     for idx, w in enumerate(web_results):
         chunk_id = f"w_{idx}"
         snippet = w.get("snippet", "")
+        raw_w_title = w.get("title", "Web Source")
+        w_title = apply_regulatory_phrase_mapping(raw_w_title, "hi") if language == "hi" else raw_w_title
         combined_chunks.append({
             "chunk_id": chunk_id,
-            "document": w.get("title", "Web Source"),
+            "document": w_title,
             "clause_label": "Web",
             "text": snippet,
             "superseded": False,
         })
         sources.append({
-            "title": w.get("title", "Web Source"),
+            "title": w_title,
             "snippet": snippet[:150],
             "url": w.get("url", ""),
             "source_type": w.get("source_type", "web"),
@@ -301,7 +295,7 @@ def handle_query(query: str, session_id: str = None, jurisdiction: str = "IN") -
                 chunk_lookup[doc_key] = c
 
         # Step 5a: Generate claims
-        gen_result = generate_answer(scrubbed_query, active_chunks, llm_client)
+        gen_result = generate_answer(scrubbed_query, active_chunks, llm_client, language=language)
 
         if not gen_result.get("can_answer", False) and not gen_result.get("parse_fallback", False):
             reason = gen_result.get("reason", "")
@@ -355,9 +349,9 @@ def handle_query(query: str, session_id: str = None, jurisdiction: str = "IN") -
             )
 
             # Step 5d: Decide Final Answer
-            final_res = decide_final_answer(verified_claims, conf_dict)
+            final_res = decide_final_answer(verified_claims, conf_dict, language=language)
 
-            answer = final_res["answer"]
+            answer = strip_markdown_decorations(final_res["answer"])
             confidence = final_res["confidence"]["score"]
 
             reasoning_steps.append({
@@ -400,9 +394,10 @@ def handle_query(query: str, session_id: str = None, jurisdiction: str = "IN") -
         "answer": answer,
         "confidence": confidence,
         "sources": sources,
-        "disclaimer": MANDATORY_DISCLAIMER,
+        "disclaimer": get_disclaimer(language),
         "supersession_paths": supersession_paths,
         "jurisdiction": jurisdiction,
+        "language": language,
         "intent": intent,
         "reasoning_steps": reasoning_steps,
         "latency_ms": latency_ms,
@@ -418,15 +413,17 @@ from sqlalchemy.orm import Session
 
 
 def handle_query_stream(query: str, user_id: str, db: Session,
-                        conversation_id: str = None, jurisdiction: str = "IN"):
+                        conversation_id: str = None, jurisdiction: str = "IN",
+                        language: str = "en"):
     """
     Streaming version of the pipeline for Server-Sent Events (SSE).
     Uses SQLAlchemy to persist messages directly into the database.
     """
     # 0. Greeting Detection
     if _is_greeting(query):
+        greeting_text = get_greeting(language)
         yield f"data: {json.dumps({'status': 'generating'})}\n\n"
-        yield f"data: {json.dumps({'status': 'token', 'token': GREETING_RESPONSE})}\n\n"
+        yield f"data: {json.dumps({'status': 'token', 'token': greeting_text})}\n\n"
         yield f"data: {json.dumps({'status': 'done', 'sources': [], 'conversation_id': conversation_id or ''})}\n\n"
         return
 
@@ -520,7 +517,7 @@ def handle_query_stream(query: str, user_id: str, db: Session,
         if c["document"] not in chunk_lookup:
             chunk_lookup[c["document"]] = c
 
-    gen_result = generate_answer(scrubbed_query, combined_chunks, llm_client)
+    gen_result = generate_answer(scrubbed_query, combined_chunks, llm_client, language=language)
 
     if not gen_result.get("can_answer", False) and not gen_result.get("parse_fallback", False):
         final_answer = gen_result.get("reason", "The sources don't contain enough specific information to answer this question reliably.")
@@ -546,7 +543,7 @@ def handle_query_stream(query: str, user_id: str, db: Session,
         conf_dict = compute_confidence(combined_chunks, verified_claims, resolve_current_document, total_claims=total_claims)
 
         final_res = decide_final_answer(verified_claims, conf_dict)
-        final_answer = final_res["answer"]
+        final_answer = strip_markdown_decorations(final_res["answer"])
         confidence = final_res["confidence"]["score"]
         thinking_content = f"Confidence: {confidence}. Verified {len(verified_claims)}/{total_claims} claims."
 

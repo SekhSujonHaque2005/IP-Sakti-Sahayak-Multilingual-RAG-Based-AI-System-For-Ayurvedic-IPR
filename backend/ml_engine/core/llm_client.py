@@ -23,6 +23,12 @@ def is_retryable_gemini_error(exc: BaseException) -> bool:
         return False
     return True
 
+def is_retryable_hf_error(exc: BaseException) -> bool:
+    msg = str(exc).lower()
+    if "402" in msg or "payment required" in msg or "depleted" in msg or "not supported" in msg:
+        return False
+    return True
+
 class LLMClient:
     def __init__(self, gemini_model="gemini-1.5-flash", hf_model="Qwen/Qwen2.5-72B-Instruct"):
         """
@@ -33,6 +39,7 @@ class LLMClient:
         self.gemini_model = gemini_model
         self.hf_model = hf_model
         self.gemini_disabled = False
+        self.hf_disabled = False
         if not GEMINI_API_KEY or GEMINI_API_KEY.startswith("AQ."):
             # Keys starting with AQ. are not valid Google AI Studio keys (must start with AIza)
             print("[LLMClient] GEMINI_API_KEY is invalid/missing. Routing directly to Hugging Face.")
@@ -56,22 +63,38 @@ class LLMClient:
         )
         return response.text
 
-    @retry(stop=stop_after_attempt(2), wait=wait_exponential(multiplier=1, min=1, max=4))
+    @retry(
+        retry=retry_if_exception(is_retryable_hf_error),
+        stop=stop_after_attempt(2),
+        wait=wait_exponential(multiplier=1, min=1, max=2)
+    )
     def _call_hf(self, system: str, user: str) -> str:
+        import time
+        now = time.time()
         if not hf_client:
-            raise ValueError("HF_API_TOKEN is not set.")
+            raise ValueError("HF Inference is disabled: no token configured.")
+        if hasattr(self, 'hf_cooldown_until') and now < self.hf_cooldown_until:
+            raise ValueError(f"HF Inference in temporary cooldown ({round(self.hf_cooldown_until - now)}s remaining).")
+
         messages = [
             {"role": "system", "content": system},
             {"role": "user", "content": user}
         ]
         
-        response = hf_client.chat_completion(
-            model=self.hf_model,
-            messages=messages,
-            max_tokens=1500,
-            temperature=0.01
-        )
-        return response.choices[0].message.content
+        try:
+            response = hf_client.chat_completion(
+                model=self.hf_model,
+                messages=messages,
+                max_tokens=1500,
+                temperature=0.01
+            )
+            return response.choices[0].message.content
+        except Exception as e:
+            msg = str(e).lower()
+            if "402" in msg or "payment required" in msg or "depleted" in msg or "429" in msg or "rate limit" in msg:
+                print(f"[LLMClient] HF rate limit/quota notice ({e}). Setting 15s cooldown.")
+                self.hf_cooldown_until = time.time() + 15
+            raise e
 
     def complete(self, system: str, user: str) -> str:
         """
@@ -89,6 +112,7 @@ class LLMClient:
                 print(f"Gemini API failed ({e}). Falling back to Hugging Face API ({self.hf_model})...")
         
         return self._call_hf(system, user)
+
 
     def complete_stream(self, system: str, user: str):
         """
