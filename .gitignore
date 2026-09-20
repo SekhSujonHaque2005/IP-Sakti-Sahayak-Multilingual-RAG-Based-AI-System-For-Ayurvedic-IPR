@@ -25,6 +25,9 @@ ocr_pending/
 *.log
 data/test_sessions/
 backend/data/test_sessions/
+backend/ml_engine/data/sessions/
+backend/ml_engine/data/analytics.jsonl
+last_resp.json
 
 # Generated ML indexes and databases (built on demand)
 backend/ml_engine/data/indices/

@@ -20,6 +20,26 @@ TRUSTED_LEGAL_DOMAINS = [
     "egazette.gov.in",
 ]
 
+RELEVANT_KEYWORDS = {
+    'ayurved', 'ayush', 'asu', 'drug', 'medicine', 'medicinal', 'herb', 'herbal',
+    'patent', 'pharma', 'health', 'botanical', 'extract', 'regulation', 'regulatory',
+    'act', 'rule', 'cdsco', 'nba', 'biodiversity', 'traditional', 'tkdl', 'treaty',
+    'trips', 'wipo', 'fssai', 'formulation', 'pharmacopoeia', 'license', 'licensing',
+    'schedule', 'clinical', 'ingredient', 'ashwagandha', 'triphala', 'plant', 'legal',
+    'statutory', 'compliance', 'clause'
+}
+
+def filter_relevant_results(results: list) -> list:
+    """Filters out irrelevant web search results (e.g. industrial hardware, PPE, safety goggles)."""
+    filtered = []
+    for r in results:
+        text = f"{r.get('title', '')} {r.get('snippet', '')} {r.get('url', '')}".lower()
+        if any(kw in text for kw in RELEVANT_KEYWORDS):
+            filtered.append(r)
+        else:
+            print(f"[WEB GUARD] Rejected irrelevant web result: '{r.get('title', '')[:50]}'")
+    return filtered
+
 def search_tavily(query: str, max_results: int, restrict_to_trusted: bool) -> list:
     api_key = os.getenv("TAVILY_API_KEY")
     if not api_key or "your_" in api_key:
@@ -161,36 +181,40 @@ def web_search(query: str, max_results: int = 5, restrict_to_trusted: bool = Fal
     # Tier 1: Tavily
     try:
         results = search_tavily(query, max_results, restrict_to_trusted)
-        if results:
+        filtered = filter_relevant_results(results)
+        if filtered:
             print("Web search succeeded via Tier 1: Tavily API")
-            return results
+            return filtered
     except Exception as e:
         print(f"Tier 1 (Tavily) failed or unconfigured: {e}")
 
     # Tier 2: Bing Scraper (Replaced Google due to 429 IP Blocks)
     try:
         results = search_bing_scraper(query, max_results, restrict_to_trusted)
-        if results:
+        filtered = filter_relevant_results(results)
+        if filtered:
             print("Web search succeeded via Tier 2: Native Bing Scraper")
-            return results
+            return filtered
     except Exception as e:
         print(f"Tier 2 (Bing Scraper) failed: {e}")
 
     # Tier 3: Exa
     try:
         results = search_exa(query, max_results, restrict_to_trusted)
-        if results:
+        filtered = filter_relevant_results(results)
+        if filtered:
             print("Web search succeeded via Tier 3: Exa Search API")
-            return results
+            return filtered
     except Exception as e:
         print(f"Tier 3 (Exa) failed or unconfigured: {e}")
 
     # Tier 4: DuckDuckGo (Scraper Fallback)
     try:
         results = search_duckduckgo(query, max_results, restrict_to_trusted)
-        if results:
+        filtered = filter_relevant_results(results)
+        if filtered:
             print("Web search succeeded via Tier 4: DuckDuckGo Scraper")
-            return results
+            return filtered
     except Exception as e:
         print(f"Tier 4 (DuckDuckGo) failed: {e}")
 

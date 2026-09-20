@@ -9,6 +9,16 @@ LEGAL_SYNONYMS = {
     "phytopharmaceutical": ["standardised extract", "plant extract", "botanical drug"],
     "TKDL": ["traditional knowledge", "prior art", "traditional knowledge digital library"],
     "WIPO": ["GRATK", "genetic resources", "traditional knowledge treaty"],
+    # Hindi/Hinglish Keyword Expansions
+    "आयुर्वेद": ["Ayurveda", "ASU medicine", "AYUSH regulatory"],
+    "रूल्स": ["Drugs and Cosmetics Act 1940", "Rule 158B", "Schedule T GMP"],
+    "रूल": ["Rule 158B", "statutory rule"],
+    "नियम": ["Drugs and Cosmetics Rules", "Rule 158B", "statutory regulations"],
+    "कानून": ["Drugs and Cosmetics Act 1940", "Patents Act 1970", "Biological Diversity Act"],
+    "पेटेंट": ["Section 3(p) Patents Act 1970", "TKDL prior art bar"],
+    "दवा": ["ASU formulation", "classical medicine", "proprietary drug"],
+    "औषधि": ["Ayurvedic medicine", "classical formulation", "Rule 158B"],
+    "लाइसेंस": ["ASU manufacturing license", "Rule 158B pathway", "Schedule T"],
 }
 
 INTENT_CATEGORIES = {
@@ -23,17 +33,17 @@ INTENT_CATEGORIES = {
 
 def detect_intent(query: str) -> str:
     query_lower = query.lower()
-    if any(w in query_lower for w in ["section", "rule", "article", "what does", "define"]):
+    if any(w in query_lower for w in ["section", "rule", "article", "what does", "define", "रूल्स", "रूल", "नियम", "कानून", "धारा", "अधिनियम"]):
         return "legal_lookup"
-    if any(w in query_lower for w in ["how to register", "how to file", "steps to", "process for", "procedure"]):
+    if any(w in query_lower for w in ["how to register", "how to file", "steps to", "process for", "procedure", "लाइसेंस", "पंजीकरण", "प्रक्रिया", "अनुमति"]):
         return "regulatory_pathway"
-    if any(w in query_lower for w in ["can i patent", "patentable", "patent", "inventive", "novelty"]):
+    if any(w in query_lower for w in ["can i patent", "patentable", "patent", "inventive", "novelty", "पेटेंट"]):
         return "patentability_check"
-    if any(w in query_lower for w in ["compare", "difference", "versus", " vs ", " vs.", "between"]):
+    if any(w in query_lower for w in ["compare", "difference", "versus", " vs ", " vs.", "between", "अंतर", "तुलना"]):
         return "comparison"
-    if any(w in query_lower for w in ["classify", "type of", "category", "what kind", "classical or"]):
+    if any(w in query_lower for w in ["classify", "type of", "category", "what kind", "classical or", "वर्गीकरण", "प्रकार"]):
         return "classification"
-    if any(w in query_lower for w in ["abs", "biodiversity", "biological resource", "nagoya", "benefit sharing"]):
+    if any(w in query_lower for w in ["abs", "biodiversity", "biological resource", "nagoya", "benefit sharing", "जैव विविधता", "अनुपालन"]):
         return "compliance"
     return "general_info"
 
@@ -45,7 +55,6 @@ def is_simple_query(query: str, intent: str) -> bool:
         return True
     if word_count <= 2:
         return True
-    # "what is X" pattern — don't add prefixes, the query is already clear
     if query.lower().strip().startswith(("what is", "what are", "tell me about", "explain")):
         if word_count <= 6:
             return True
@@ -53,53 +62,47 @@ def is_simple_query(query: str, intent: str) -> bool:
 
 
 def expand_query(query: str) -> str:
-    """Add legal synonyms to improve retrieval, but only for specific terms."""
+    """Add legal synonyms in English and Hindi to improve dense + sparse retrieval."""
     expanded_terms = []
     query_lower = query.lower()
     for keyword, synonyms in LEGAL_SYNONYMS.items():
         if keyword.lower() in query_lower:
-            expanded_terms.extend(synonyms[:2])
+            expanded_terms.extend(synonyms[:3])
     if expanded_terms:
-        return f"{query} {' '.join(expanded_terms)}"
+        # Keep unique terms
+        unique_terms = list(dict.fromkeys(expanded_terms))
+        return f"{query} {' '.join(unique_terms)}"
     return query
 
 
 def rewrite_for_retrieval(query: str, intent: str) -> str:
     """
-    Rewrite the query to improve retrieval quality.
-    FIXED: Don't mangle simple/short queries — only add prefixes
-    for specific, complex queries.
+    Rewrite the query to improve retrieval quality across vector indices.
+    Preserves original query and appends high-value statutory terms.
     """
-    # Don't rewrite simple queries — they work fine as-is
-    if is_simple_query(query, intent):
-        return query
-
-    intent_prefixes = {
-        "legal_lookup": "legal provision text of",
-        "regulatory_pathway": "regulatory steps process for",
-        "patentability_check": "patentability requirements under Indian law for",
-        "comparison": "comparison between",
-        "classification": "Ayurveda product classification criteria for",
-        "compliance": "ABS compliance requirements for",
-        "general_info": "",
-    }
-    prefix = intent_prefixes.get(intent, "")
     expanded = expand_query(query)
-    if prefix:
-        return f"{prefix} {expanded}"
     return expanded
 
 
-def extract_legal_entities(query: str) -> dict:
+def get_clean_web_search_query(raw_query: str) -> str:
+    """
+    Generates a clean, targeted query for external search engines
+    so that searches for Ayurveda legal/regulatory rules don't return
+    irrelevant commercial industrial supplies.
+    """
     import re
-    entities = {
-        "sections": re.findall(r'(?:Section|Rule|Article|Schedule)\s+[\d\w\-\.()]+', query, re.IGNORECASE),
-        "acts": re.findall(r'(?:[\w\s]+Act[\s,]\s*\d{4})', query, re.IGNORECASE),
-        "jurisdictions": [],
-    }
-    query_lower = query.lower()
-    if any(w in query_lower for w in ["india", "indian", "domestic", "national"]):
-        entities["jurisdictions"].append("IN")
-    if any(w in query_lower for w in ["international", "global", "wipo", "treaty", "foreign"]):
-        entities["jurisdictions"].append("INTL")
-    return entities
+    q = raw_query.strip()
+    q_clean = re.sub(r'^(tell me about|what is|explain|who is|can you tell me about|मुझे|बताओ|सारे)\s+', '', q, flags=re.IGNORECASE).strip()
+
+    # Detect if query is about Ayurveda regulations/rules
+    has_ayurveda = any(k in q.lower() for k in ["ayurved", "आयुर्वेद", "herb", "herbal", "औषधि", "दवा"])
+    has_rules = any(k in q.lower() for k in ["rule", "rules", "रूल्स", "रूल", "नियम", "कानून", "regulation", "act", "law"])
+
+    if has_ayurveda and has_rules:
+        return "Ayurveda regulatory rules India Drugs and Cosmetics Act 1940 Rule 158B Schedule T AYUSH"
+    elif has_rules and not has_ayurveda:
+        return f"{q_clean} Ayurveda pharmaceutical regulatory law India"
+    elif has_ayurveda:
+        return f"Ayurveda AYUSH regulation {q_clean}"
+
+    return q_clean if len(q_clean) >= 3 else q
